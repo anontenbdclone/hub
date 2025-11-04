@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Open Porn Hub By Tap The Open Site Button In Down!</title>
+  <style>
+    :root{
+      --bg:#0b0f14; --panel:#0f1720; --accent:#ff6b6b; --muted:#9aa4b2;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    body{margin:0;background:linear-gradient(180deg,#071019 0%, #07131a 100%);color:#e6eef6;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px;}
+    .card{width:100%;max-width:980px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);padding:20px;border-radius:12px;box-shadow:0 6px 30px rgba(3,7,12,0.6);}
+    h1{margin:0 0 6px 0;font-size:20px;letter-spacing:0.4px}
+    p.small{margin:0 0 16px 0;color:var(--muted);font-size:13px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+    .btn{
+      background:linear-gradient(90deg,var(--accent),#ff8f8f);border:0;color:#081018;padding:10px 14px;border-radius:8px;font-weight:600;cursor:pointer;
+      box-shadow:0 6px 18px rgba(255,107,107,0.12);text-decoration:none;
+    }
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);box-shadow:none}
+    .frame-wrap{position:relative;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.02);min-height:420px;background:#071018}
+    iframe{width:100%;height:600px;border:0;display:block}
+    .fallback{padding:28px;text-align:center;color:var(--muted)}
+    .status{font-size:13px;color:var(--muted);margin-top:8px}
+    footer{margin-top:12px;color:var(--muted);font-size:12px}
+    .danger{color:#ffb3b3}
+  </style>
+</head>
+<body>
+  <main class="card" role="main">
+    <header>
+      <h1>Open Porn Hub By Tap The Open Site Button In Down!</h1>
+      <p class="small">Don't forget to use vpn, without vpn coming soon..</p>
+    </header>
+
+    <div class="controls" aria-hidden="false">
+      <!-- This button opens the site in the current tab -->
+      <button id="openSameTab" class="btn" type="button" title="Open site in this window (same tab)">Open Site</button>
+
+
+
+  <script>
+    (function(){
+      const url = "https://www.pornhub.com/"; // target URL — change if needed
+      const openSameTabBtn = document.getElementById('openSameTab');
+      const embedBtn = document.getElementById('tryEmbed');
+      const reloadBtn = document.getElementById('reloadFrame');
+      const frameWrap = document.getElementById('frameWrap');
+
+      // 1) Open in same tab (navigate)
+      openSameTabBtn.addEventListener('click', () => {
+        // Warning: this will navigate away from this page.
+        // Use window.location.assign to ensure history entry (back button works).
+        window.location.assign(url);
+      });
+
+      // 2) Create / attempt to embed iframe
+      function createIframe(src) {
+        frameWrap.innerHTML = ''; // clear
+        const iframe = document.createElement('iframe');
+
+        // recommended sandbox attributes - adjust as needed (keeps some restrictions)
+        iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms');
+        iframe.src = src;
+        iframe.title = "Embedded site";
+
+        // watch load event — note: if the framed site is cross-origin, we cannot inspect its DOM
+        let loaded = false;
+        const loadTimeout = setTimeout(() => {
+          // if load hasn't fired after a short time, we leave indicator (some sites take longer)
+          if (!loaded) {
+            // do nothing aggressive — inform user and allow them to navigate in same tab
+            showBlockedMessage("Embed attempt timed out or was blocked. You can navigate this tab to the site using 'Open Site (Same Tab)'.", true);
+            reloadBtn.style.display = 'inline-block';
+          }
+        }, 3000);
+
+        iframe.addEventListener('load', () => {
+          loaded = true;
+          clearTimeout(loadTimeout);
+          // Many sites load but then show nothing due to anti-framing policies; cannot detect cross-origin blanking reliably.
+          showMessage("Embed load event fired. If the content appears blank, the site may actively block framing. Use 'Open Site (Same Tab)' to navigate.", false);
+          reloadBtn.style.display = 'inline-block';
+        });
+
+        iframe.addEventListener('error', () => {
+          clearTimeout(loadTimeout);
+          showBlockedMessage("Embed failed (browser refused to load the frame). Use 'Open Site (Same Tab)' to navigate.", true);
+          reloadBtn.style.display = 'inline-block';
+        });
+
+        frameWrap.appendChild(iframe);
+        return iframe;
+      }
+
+      function showMessage(msg, isError){
+        frameWrap.innerHTML = `<div class="fallback"><strong>${isError ? "Note" : "Embed"}</strong><div class="status">${msg}</div></div>`;
+      }
+
+      function showBlockedMessage(msg, isError){
+        // Show message and include a one-click fallback to open in same tab
+        frameWrap.innerHTML = `
+          <div class="fallback">
+            <strong>${isError ? "Embed blocked or failed" : "Notice"}</strong>
+            <div class="status" style="margin:12px 0 16px 0">${msg}</div>
+            <div>
+              <button id="fallbackNavigate" class="btn" style="padding:8px 12px">Open Site Here (Same Tab)</button>
+            </div>
+            <div class="status" style="margin-top:10px;color:var(--muted);font-size:12px">No attempt was made to bypass site protections.</div>
+          </div>
+        `;
+        const fb = document.getElementById('fallbackNavigate');
+        if (fb) {
+          fb.addEventListener('click', () => {
+            window.location.assign(url);
+          });
+        }
+      }
+
+      embedBtn.addEventListener('click', () => {
+        showMessage("Attempting to embed — waiting for browser response...", false);
+        try {
+          createIframe(url);
+        } catch (e) {
+          showBlockedMessage("Failed to create iframe: " + (e && e.message ? e.message : "unknown error"), true);
+        }
+      });
+
+      reloadBtn.addEventListener('click', () => {
+        try {
+          createIframe(url);
+        } catch (e) {
+          showBlockedMessage("Reload failed: " + (e && e.message ? e.message : "unknown error"), true);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
