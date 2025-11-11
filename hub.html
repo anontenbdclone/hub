@@ -30,111 +30,14 @@
 <body>
   <main class="card" role="main">
     <header>
-      <h1>Open Porn Hub By Tap The Open Site Button In Down!</h1>
-      <p class="small">Don't forget to use vpn, without vpn coming soon..</p>
+      <h1>Website is currently server down</h1>
+      <p class="small">you pervert.</p>
     </header>
 
     <div class="controls" aria-hidden="false">
       <!-- This button opens the site in the current tab -->
       <button id="openSameTab" class="btn" type="button" title="Open site in this window (same tab)">Open Site</button>
 
-
-
-  <script>
-    (function(){
-      const url = "https://www.pornhub.com/"; // target URL — change if needed
-      const openSameTabBtn = document.getElementById('openSameTab');
-      const embedBtn = document.getElementById('tryEmbed');
-      const reloadBtn = document.getElementById('reloadFrame');
-      const frameWrap = document.getElementById('frameWrap');
-
-      // 1) Open in same tab (navigate)
-      openSameTabBtn.addEventListener('click', () => {
-        // Warning: this will navigate away from this page.
-        // Use window.location.assign to ensure history entry (back button works).
-        window.location.assign(url);
-      });
-
-      // 2) Create / attempt to embed iframe
-      function createIframe(src) {
-        frameWrap.innerHTML = ''; // clear
-        const iframe = document.createElement('iframe');
-
-        // recommended sandbox attributes - adjust as needed (keeps some restrictions)
-        iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms');
-        iframe.src = src;
-        iframe.title = "Embedded site";
-
-        // watch load event — note: if the framed site is cross-origin, we cannot inspect its DOM
-        let loaded = false;
-        const loadTimeout = setTimeout(() => {
-          // if load hasn't fired after a short time, we leave indicator (some sites take longer)
-          if (!loaded) {
-            // do nothing aggressive — inform user and allow them to navigate in same tab
-            showBlockedMessage("Embed attempt timed out or was blocked. You can navigate this tab to the site using 'Open Site (Same Tab)'.", true);
-            reloadBtn.style.display = 'inline-block';
-          }
-        }, 3000);
-
-        iframe.addEventListener('load', () => {
-          loaded = true;
-          clearTimeout(loadTimeout);
-          // Many sites load but then show nothing due to anti-framing policies; cannot detect cross-origin blanking reliably.
-          showMessage("Embed load event fired. If the content appears blank, the site may actively block framing. Use 'Open Site (Same Tab)' to navigate.", false);
-          reloadBtn.style.display = 'inline-block';
-        });
-
-        iframe.addEventListener('error', () => {
-          clearTimeout(loadTimeout);
-          showBlockedMessage("Embed failed (browser refused to load the frame). Use 'Open Site (Same Tab)' to navigate.", true);
-          reloadBtn.style.display = 'inline-block';
-        });
-
-        frameWrap.appendChild(iframe);
-        return iframe;
-      }
-
-      function showMessage(msg, isError){
-        frameWrap.innerHTML = `<div class="fallback"><strong>${isError ? "Note" : "Embed"}</strong><div class="status">${msg}</div></div>`;
-      }
-
-      function showBlockedMessage(msg, isError){
-        // Show message and include a one-click fallback to open in same tab
-        frameWrap.innerHTML = `
-          <div class="fallback">
-            <strong>${isError ? "Embed blocked or failed" : "Notice"}</strong>
-            <div class="status" style="margin:12px 0 16px 0">${msg}</div>
-            <div>
-              <button id="fallbackNavigate" class="btn" style="padding:8px 12px">Open Site Here (Same Tab)</button>
-            </div>
-            <div class="status" style="margin-top:10px;color:var(--muted);font-size:12px">No attempt was made to bypass site protections.</div>
-          </div>
-        `;
-        const fb = document.getElementById('fallbackNavigate');
-        if (fb) {
-          fb.addEventListener('click', () => {
-            window.location.assign(url);
-          });
-        }
-      }
-
-      embedBtn.addEventListener('click', () => {
-        showMessage("Attempting to embed — waiting for browser response...", false);
-        try {
-          createIframe(url);
-        } catch (e) {
-          showBlockedMessage("Failed to create iframe: " + (e && e.message ? e.message : "unknown error"), true);
-        }
-      });
-
-      reloadBtn.addEventListener('click', () => {
-        try {
-          createIframe(url);
-        } catch (e) {
-          showBlockedMessage("Reload failed: " + (e && e.message ? e.message : "unknown error"), true);
-        }
-      });
-    })();
-  </script>
 </body>
+
 </html>
