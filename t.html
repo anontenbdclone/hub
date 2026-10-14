@@ -1,0 +1,591 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Application Gateway</title>
+
+  <style>
+    :root {
+      --bg-canvas: #0a0b10;
+      --card-bg: rgba(13, 15, 23, 0.75);
+      --primary-accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.2);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #475569;
+      --border-subtle: rgba(255, 255, 255, 0.04);
+      --border-active: rgba(56, 189, 248, 0.4);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-canvas);
+      background-image:
+        radial-gradient(at 50% 0%, rgba(56,189,248,.12) 0, transparent 50%),
+        radial-gradient(rgba(255,255,255,.015) 1px, transparent 1px);
+      background-size: 100% 100%, 24px 24px;
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 16px;
+      overflow-y: auto;
+      letter-spacing: -0.01em;
+    }
+
+    .console-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card-bg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border-subtle);
+      padding: 44px 36px 36px;
+      border-radius: 14px;
+      box-shadow:
+        0 30px 60px rgba(0,0,0,.8),
+        inset 0 1px 0 rgba(255,255,255,.03);
+      position: relative;
+      transition: transform .4s cubic-bezier(.16,1,.3,1);
+    }
+
+    .security-badge,
+    .standalone-license-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(56,189,248,.06);
+      border: 1px solid rgba(56,189,248,.15);
+      padding: 5px 12px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--primary-accent);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .security-badge {
+      margin-bottom: 24px;
+    }
+
+    .dot {
+      width: 5px;
+      height: 5px;
+      flex-shrink: 0;
+      background-color: var(--primary-accent);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--primary-accent);
+    }
+
+    header {
+      margin-bottom: 30px;
+      text-align: left;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 8px;
+      letter-spacing: -.02em;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 13.5px;
+      line-height: 1.5;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .action-box {
+      width: 100%;
+      background: linear-gradient(
+        180deg, rgba(255,255,255,.01), transparent
+      );
+      border: 1px solid var(--border-subtle);
+      color: #fff;
+      padding: 16px 20px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all .25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-align: left;
+    }
+
+    .action-box:hover {
+      background: rgba(255,255,255,.03);
+      border-color: var(--border-active);
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    .action-box:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    .action-label {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+    }
+
+    .action-title {
+      font-weight: 500;
+      color: #fff;
+    }
+
+    .action-desc {
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    .action-box svg {
+      flex-shrink: 0;
+      transition: transform .2s ease;
+      color: var(--text-secondary);
+    }
+
+    .action-box:hover svg {
+      transform: translateX(4px);
+      color: var(--primary-accent);
+    }
+
+    footer {
+      margin-top: 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-muted);
+      font-size: 11px;
+      border-top: 1px solid rgba(255,255,255,.03);
+      padding-top: 18px;
+      font-family: monospace;
+    }
+
+    .down-side-area {
+      width: 100%;
+      max-width: 420px;
+      margin-top: 54px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .standalone-license-trigger {
+      font-family: system-ui, sans-serif;
+      cursor: pointer;
+      user-select: none;
+      transition: all .25s ease;
+      box-shadow: 0 0 12px rgba(56,189,248,.15);
+    }
+
+    .standalone-license-trigger:hover {
+      background: rgba(56,189,248,.12);
+      border-color: rgba(56,189,248,.3);
+      box-shadow: 0 0 16px rgba(56,189,248,.3);
+    }
+
+    .standalone-license-trigger.panel-open {
+      box-shadow:
+        0 0 20px rgba(56,189,248,.4),
+        inset 0 0 6px rgba(56,189,248,.2);
+    }
+
+    .external-license-panel {
+      width: 100%;
+      background: #0d0f17;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      padding: 0;
+      max-height: 0;
+      opacity: 0;
+      transform: translateY(-8px);
+      overflow: hidden;
+      transition:
+        max-height .5s cubic-bezier(.16,1,.3,1),
+        opacity .4s ease,
+        transform .5s cubic-bezier(.16,1,.3,1);
+    }
+
+    .external-license-panel.active {
+      max-height: 280px;
+      opacity: 1;
+      transform: translateY(0);
+      border-color: var(--border-active);
+      animation: externalNeonGlow 2.5s infinite alternate ease-in-out;
+    }
+
+    @keyframes externalNeonGlow {
+      from {
+        box-shadow: 0 20px 40px rgba(0,0,0,.6),
+          0 0 15px rgba(56,189,248,.04);
+        border-color: rgba(56,189,248,.18);
+      }
+      to {
+        box-shadow: 0 20px 45px rgba(0,0,0,.7),
+          0 0 32px rgba(56,189,248,.22);
+        border-color: var(--border-active);
+      }
+    }
+
+    .panel-header {
+      font-family: monospace;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--primary-accent);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      padding: 16px 20px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.03);
+    }
+
+    .panel-body {
+      padding: 14px 20px 20px;
+    }
+
+    .license-text {
+      font-family: monospace;
+      font-size: 11px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      max-height: 120px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      text-align: left;
+      padding-right: 6px;
+    }
+
+    .license-text::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    .license-text::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,.06);
+      border-radius: 2px;
+    }
+
+    .license-text::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-accent);
+    }
+
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-canvas);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity .4s ease, visibility .4s ease;
+    }
+
+    .loading-overlay.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .loader-element {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      max-width: 240px;
+      width: 100%;
+      padding: 0 12px;
+    }
+
+    .status-terminal {
+      font-size: 12px;
+      font-weight: 500;
+      font-family: monospace;
+      color: var(--text-secondary);
+      text-align: center;
+      min-height: 16px;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 2px;
+      background: rgba(255,255,255,.03);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--primary-accent);
+      box-shadow: 0 0 8px var(--primary-accent);
+      transition: width .08s linear;
+    }
+
+    @media (max-width: 420px) {
+      .console-card {
+        padding: 32px 22px 28px;
+      }
+
+      .down-side-area {
+        margin-top: 36px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="console-card" id="portalCard" role="main">
+    <div class="security-badge">
+      <span class="dot"></span>
+      Anon Verified
+    </div>
+
+    <header>
+      <h1>SPECIAL GATEWAY</h1>
+      <p class="subtitle">
+        Select an option below to open your chosen hot website.
+      </p>
+    </header>
+
+    <div class="controls">
+      <!-- WEBSITE 1: Change this URL -->
+      <button
+        class="action-box"
+        type="button"
+        data-url="https://www.pornhub.com/"
+      >
+        <span class="action-label">
+          <span class="action-title">Porn Hub</span>
+          <span class="action-desc">Without Vpn</span>
+        </span>
+
+        <svg width="16" height="16" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round"
+          aria-hidden="true">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button>
+
+      <!-- WEBSITE 2: Change this URL -->
+      <button
+        class="action-box"
+        type="button"
+        data-url="https://www.hentaicity.com/"
+      >
+        <span class="action-label">
+          <span class="action-title">Hentai City</span>
+          <span class="action-desc">Anime Porn</span>
+        </span>
+
+        <svg width="16" height="16" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round"
+          aria-hidden="true">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button>
+    </div>
+
+    <footer>
+      <span>AUTH: OAUTH2</span>
+      <span>v2.4.1</span>
+    </footer>
+  </main>
+
+  <div class="down-side-area">
+    <button
+      id="triggerLicense"
+      class="standalone-license-trigger"
+      type="button"
+      aria-expanded="false"
+      aria-controls="externalLicensePanel"
+    >
+      <span class="dot"></span>
+      MIT_LICENSE
+    </button>
+
+    <div id="externalLicensePanel" class="external-license-panel">
+      <div class="panel-header">// REGISTERED_MIT_LICENSE_STREAM</div>
+
+      <div class="panel-body">
+        <div class="license-text">MIT License
+
+Copyright (c) 2026 Corporate Access Gateway
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="loadingOverlay" class="loading-overlay" aria-live="polite">
+    <div class="loader-element">
+      <div id="statusTerminal" class="status-terminal">
+        Initializing connection...
+      </div>
+
+      <div
+        class="progress-track"
+        role="progressbar"
+        aria-label="Connection progress"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+        id="progressTrack"
+      >
+        <div id="progressFill" class="progress-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const launchButtons = document.querySelectorAll(
+        ".action-box[data-url]"
+      );
+
+      const portalCard = document.getElementById("portalCard");
+      const loadingOverlay = document.getElementById("loadingOverlay");
+      const progressFill = document.getElementById("progressFill");
+      const progressTrack = document.getElementById("progressTrack");
+      const statusTerminal = document.getElementById("statusTerminal");
+
+      const triggerLicense = document.getElementById("triggerLicense");
+      const externalLicensePanel = document.getElementById(
+        "externalLicensePanel"
+      );
+
+      const systemMilestones = [
+        { percentage: 25, label: "verifying process...." },
+        { percentage: 55, label: "generating web function..." },
+        { percentage: 80, label: "allowing to enter...." },
+        { percentage: 100, label: "successfull..." }
+      ];
+
+      let launchTimer = null;
+
+      launchButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const targetUrl = button.dataset.url;
+
+          // Accept only valid HTTP or HTTPS website URLs.
+          let parsedUrl;
+
+          try {
+            parsedUrl = new URL(targetUrl);
+          } catch {
+            statusTerminal.textContent = "Invalid destination URL.";
+            return;
+          }
+
+          if (!["http:", "https:"].includes(parsedUrl.protocol)) {
+            statusTerminal.textContent = "Unsupported destination URL.";
+            return;
+          }
+
+          if (launchTimer !== null) {
+            clearInterval(launchTimer);
+          }
+
+          launchButtons.forEach((item) => {
+            item.disabled = true;
+          });
+
+          portalCard.style.transform = "scale(0.98)";
+          progressFill.style.width = "0%";
+          progressTrack.setAttribute("aria-valuenow", "0");
+          statusTerminal.textContent = "Initializing connection...";
+          loadingOverlay.classList.add("active");
+
+          let progressValue = 0;
+
+          launchTimer = setInterval(() => {
+            progressValue = Math.min(progressValue + 2.5, 100);
+
+            progressFill.style.width = progressValue + "%";
+            progressTrack.setAttribute(
+              "aria-valuenow",
+              String(progressValue)
+            );
+
+            const currentStep = systemMilestones.find(
+              (step) => progressValue <= step.percentage
+            );
+
+            if (currentStep) {
+              statusTerminal.textContent = currentStep.label;
+            }
+
+            if (progressValue >= 100) {
+              clearInterval(launchTimer);
+              launchTimer = null;
+
+              // Redirect to the URL belonging to the clicked button.
+              window.location.assign(parsedUrl.href);
+            }
+          }, 35);
+        });
+      });
+
+      if (triggerLicense && externalLicensePanel) {
+        triggerLicense.addEventListener("click", () => {
+          const isOpen = externalLicensePanel.classList.toggle("active");
+
+          triggerLicense.classList.toggle("panel-open", isOpen);
+          triggerLicense.setAttribute("aria-expanded", String(isOpen));
+
+          if (isOpen) {
+            setTimeout(() => {
+              externalLicensePanel.scrollIntoView({
+                behavior: "smooth",
+                block: "nearest"
+              });
+            }, 150);
+          }
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
